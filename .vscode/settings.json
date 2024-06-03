@@ -1,7 +1,9 @@
 {
     "files.associations": {
         "*.embeddedhtml": "html",
-        "map": "cpp"
+        "map": "cpp",
+        "set": "cpp",
+        "list": "cpp"
     },
     "cmake.sourceDirectory": "/Users/chawanvattanalap/Downloads/Airdrop(s)/RoServercodeZERO/googletest"
 }

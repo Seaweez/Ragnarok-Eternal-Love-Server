@@ -68,6 +68,30 @@ class Boss
         return m_dwRefreshTime - m_dwRefreshTime % MIN_T;
       return t;
     }
+    virtual DWORD getRefreshTimeMvpV2()
+    {
+      if (!m_dwDieTime && !m_dwRefreshTime) return 0;
+      DWORD t = m_dwDieTime + base->getReliveTime(getMapID()) * MIN_T;
+      DWORD d = t > m_dwRefreshTime ? t - m_dwRefreshTime : m_dwRefreshTime - t;
+      if (d > MiscConfig::getMe().getBossCFG().dwRefreshBaseTimes){
+        return m_dwRefreshTime - m_dwRefreshTime % MIN_T;
+      }
+      return getNextEvenHour(m_dwDieTime);
+    }
+
+    DWORD getNextEvenHour(DWORD time)
+    {
+      DWORD hour = time / HOUR_T;
+      DWORD nextEvenHour = (hour / 2) * 2;
+      return nextEvenHour * HOUR_T;
+    }
+
+    DWORD getNextOddHour(DWORD time)
+    {
+      DWORD hour = time / HOUR_T;
+      DWORD nextOddHour = (hour / 2) * 2 + 1;
+      return nextOddHour * HOUR_T;
+    }
     void setSetTime(DWORD dwTime) { m_dwSetTime = dwTime; }
     DWORD getSetTime() const { return m_dwSetTime; }
 

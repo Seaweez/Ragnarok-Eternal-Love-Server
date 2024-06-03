@@ -74,7 +74,11 @@ bool BossList::doUserCmd(SessionUser *user, const BYTE *buf, WORD len)
           Cmd::BossInfoItem *item = message.add_bosslist();
           item->set_id(it.second->id);
           //if (BossState::WaitRefresh==it.second->getState())
+          if (pCFG->eType == EBOSSTYPE_MINI && it.second->getSetTime() == 0){
             item->set_refreshtime(it.second->getRefreshTime());
+          }else{
+            item->set_refreshtime(it.second->getRefreshTimeMvpV2());
+          }
           //   item->set_refreshstate(getRereshState(cur, it.second->m_dwRefreshTime));
           // else
           //   item->set_refreshstate(EBOSSREFRESHSTATE_APPEARED);
@@ -119,8 +123,15 @@ bool BossList::doUserCmd(SessionUser *user, const BYTE *buf, WORD len)
             Cmd::BossInfoItem *item = message.add_minilist();
             if (item == nullptr) continue;
             item->set_id(it.second->id);
-            if (BossState::WaitRefresh==it.second->getState())
-              item->set_refreshtime(it.second->getRefreshTime());
+            if (BossState::WaitRefresh==it.second->getState()){
+              // item->set_refreshtime(it.second->getRefreshTime());
+              const SBossCFG* pCFG = it.second->base;
+              if (pCFG->eType == EBOSSTYPE_MINI && it.second->getSetTime() == 0){
+                item->set_refreshtime(it.second->getRefreshTime());
+              }else{
+                item->set_refreshtime(it.second->getRefreshTimeMvpV2());
+              }
+            }
             //   item->set_refreshstate(getRereshState(cur, it.second->m_dwRefreshTime));
             // else
             //   item->set_refreshstate(EBOSSREFRESHSTATE_APPEARED);
@@ -500,8 +511,10 @@ void BossList::onBossDie(DWORD npcid, const char *killer, QWORD killerId, DWORD 
       XERR << "[Boss-击杀] map :" << mapid << "id :" << npcid << "被" << killerId << killer << "击杀, 更新状态失败,该boss未包含正确的配置" << XEND;
       return;
     }
-
-    pBoss->m_dwRefreshTime = reset ? curTime : curTime + calcRefreshTime(pBoss->base->getReliveTime(pBoss->getMapID()) * MIN_T);
+    // pBoss->m_dwRefreshTime = reset ? nextEvenHour : nextEvenHour + calcRefreshTime(pBoss->base->getReliveTime(pBoss->getMapID()) * MIN_T);
+    // pBoss->m_dwRefreshTime = nextEvenHour;
+    DWORD nextEvenHour = (curTime / 3600) % 2 == 0 ? (curTime / 3600 + 1) * 3600 : (curTime / 3600 + 2) * 3600;
+    pBoss->m_dwRefreshTime = reset ? curTime : nextEvenHour;
     pBoss->setDieTime(curTime);
     pBoss->m_strLastKiller.clear();
     pBoss->setState(BossState::WaitRefresh);
@@ -661,7 +674,7 @@ void BossList::refresh(Boss *boss)
     boss->setState(BossState::Refreshed);
     if (boss->base->getType() != EBOSSTYPE_DEAD)
       boss->m_dwSummonTime = now();
-    XLOG << "[Boss-刷新], 发送场景成功, boss:" << boss->id << "地图:" << boss->getMapID() << XEND;
+    XLOG << "[Boss-Refresh], Scene sent successfully, boss:" << boss->id << " map:" << boss->getMapID() << XEND;
   }
 }
 

@@ -72,13 +72,6 @@ bool xSceneEntryDynamic::isMyEnemy(xSceneEntryDynamic* target)
     {
       if (pSelf->getTransform().isMonster() || pTarget->getTransform().isMonster())
         return true;
-      if (isMyTeamMember(target->id))
-        return false;
-      QWORD guild1 = pSelf->getGuild().id();
-      QWORD guild2 = pTarget->getGuild().id();
-      if (guild1 == 0 || guild2 == 0)
-        return true;
-      return guild1 != guild2;
     }
     if (getScene()->isPVPScene())
     {
@@ -86,7 +79,11 @@ bool xSceneEntryDynamic::isMyEnemy(xSceneEntryDynamic* target)
         return false;
       if (pSelf->isMyTeamMember(pTarget->id))
         return false;
-      return true;
+      QWORD guild1 = pSelf->getGuild().id();
+      QWORD guild2 = pTarget->getGuild().id();
+      if (guild1 == 0 || guild2 == 0)
+        return true;
+      return guild1 != guild2;
     }
     if (bGvgFire())
     {
