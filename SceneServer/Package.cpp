@@ -11384,7 +11384,7 @@ bool EquipPackage::canEquip(SceneUser* pUser, const ItemBase* pBase, bool bNotic
   {
     if (pUser->hasGuild() == false || pUser->getGuild().isUserOwnArtifact(pUser->id, pEquip->getGUID()) == false)
       return false;
-    // 卡牌副本不能装备神器
+    // Card copies cannot be equipped with artifacts
     if (pUser->getScene() && pUser->getScene()->getSceneType() == SCENE_TYPE_PVECARD)
     {
       MsgManager::sendMsg(pUser->id, 119);

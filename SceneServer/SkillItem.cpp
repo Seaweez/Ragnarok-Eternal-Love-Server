@@ -1563,7 +1563,7 @@ bool BaseSkill::collectDamage(SkillRunner& oRunner) const
     if (isEnemy == false && m_eCamp == ESKILLCAMP_ENEMY)
       continue;
 
-    // 治愈类
+    // Healing
     if (isEnemy == false)
     {
       handleDamage(pEntry, attacker, pHit, size * ONE_THOUSAND + i + 1, oRunner);
@@ -1580,7 +1580,7 @@ bool BaseSkill::collectDamage(SkillRunner& oRunner) const
       pData->add_hitedtargets()->CopyFrom(*pHit);
       continue;
     }
-    // 采集
+    // collection
     if (ESKILLNUMBER_CAIJI == oCmd.data().number())
     {
       pData->add_hitedtargets()->CopyFrom(*pHit);
@@ -1592,14 +1592,14 @@ bool BaseSkill::collectDamage(SkillRunner& oRunner) const
       continue;
     handleDamage(pEntry, attacker, pHit, size * ONE_THOUSAND + i + 1, oRunner);
 
-    // 类型为invalid时, 表示该技能对该敌人无任何你作用
+    // When the type is invalid, it means that the skill has no effect on the enemy.
     if (pHit->type() == DAMAGE_TYPE_INVALID && pHit->sharetargets_size() <= 0)
     {
-      buffTargets.erase(pHit->charid());// 对于敌人命中才会添加buff
+      buffTargets.erase(pHit->charid());// The buff will only be added to the enemy's hit
       continue;
     }
 
-    // 暴击 表情
+    // crit emoticon
     if (pHit->type() == DAMAGE_TYPE_CRITICAL)
     {
       attacker->checkEmoji("Critical");
@@ -1612,18 +1612,20 @@ bool BaseSkill::collectDamage(SkillRunner& oRunner) const
       pEntry->checkEmoji("Miss");
       attacker->checkEmoji("EnemyMiss");
       bool berase = true;
-      if (pHit->sharetargets_size() > 0)  // 分担伤害时buff效果依然有效
+      if (pHit->sharetargets_size() > 0)  // The buff effect is still effective when the damage is shared
         berase = false;
-      if (attacker->isMissStillBuff()) // miss依然需要添加buff
+      if (attacker->isMissStillBuff()) // Miss still needs to add buffs
         berase = false;
 
       if (berase)
-        buffTargets.erase(pHit->charid());// 对于敌人命中才会添加buff
+        buffTargets.erase(pHit->charid());// The buff will only be added to the enemy's hit
+
     }
 
     pData->add_hitedtargets()->CopyFrom(*pHit);
 
-    // 位置同步
+    // location sync
+    // if (m_fHitBack != 0 && pHit->damage() > 0 && pEntry->isNoHitBack() == false)
     if (m_fHitBack != 0 && pHit->damage() > 0 && isClientNoSelect() && pEntry->isNoHitBack() == false)
     {
       if (checkNoHitback(attacker) == false)
@@ -2139,7 +2141,7 @@ bool BaseSkill::collectTarget(SkillRunner& oRunner) const
         }
         checkok = false;
       }
-      // 额外选择client no view target, ex: SkillNpc
+      // Additional client selection no view target, ex: SkillNpc
       if (attacker->getScene() && attacker->getScene()->isPVPScene() && attacker->getEntryType() == SCENE_ENTRY_USER)
       {
         for (auto &s : set)
@@ -3361,7 +3363,7 @@ void BaseSkill::end(SkillRunner& oRunner) const
   }
 }
 
-// 技能运行流程
+// Skill operation process
 bool BaseSkill::run(SkillRunner& oRunner) const
 {
   // trap
@@ -3371,41 +3373,41 @@ bool BaseSkill::run(SkillRunner& oRunner) const
       return false;
   }
 
-  // 获得技能目标
+  // Get skill target
   if (haveNoTargets() == false)
   {
     if (collectTarget(oRunner) == false)
       return false;
   }
 
-  // 计算伤害
+  // Calculate damage
   if (m_bHaveDamage)
   {
     if (collectDamage(oRunner) == false)
       return false;
   }
 
-  // 处理CommonFun返回, 实现特殊效果
+  // Process CommonFun returns to achieve special effects
   runSpecEffect(oRunner);
 
-  // 通知前端伤害信息 & 技能运行阶段同步
+  // Notify front-end of damage information & synchronize skill running phase
   sendSkillStatusRun(oRunner);
 
-  // 技能效果, 掉血, 位移
+  // Skill effects, blood loss, displacement
   //if (m_bHaveDamage)
   {
     if (runEffect(oRunner) == false)
       return false;
   }
 
-  // 添加buff
+  // add buff
   bool haveBuffEffect = false;
   if (m_bHaveBuff)
   {
     haveBuffEffect = addBuff(oRunner);
   }
 
-  // 计数
+  // count
   if (isTimeTrap())
   {
     if (haveBuffEffect || oRunner.getCmd().data().hitedtargets_size() != 0)
@@ -3463,7 +3465,7 @@ bool AttackSkill::run(SkillRunner& oRunner) const
   if (BaseSkill::run(oRunner) == false)
     return false;
 
-  // 使用攻击类技能时，消除隐匿状态
+  // When using attack skills, the invisible state is eliminated
   xSceneEntryDynamic* attacker = oRunner.getEntry();
   //attacker = getRealAttacker(attacker);
   if (checkAttacker(attacker) == false)
@@ -3476,7 +3478,7 @@ bool AttackSkill::run(SkillRunner& oRunner) const
   }
   else
   {
-    // 概率不删除隐匿
+    // Probability not to delete hidden
     DWORD rate = LuaManager::getMe().call<DWORD> ("calcFormulaValue", attacker, attacker, m_stLogicParam.m_dwDispHideType);
     if (rate <= (DWORD)randBetween(1, 100))
     {
@@ -3544,7 +3546,7 @@ RepairSkill::~RepairSkill()
 }
 
 
-// ------- 瞬移技能 -----------
+// ------- teleportation skills -----------
 TelesportSkill::TelesportSkill(DWORD id, ESkillType eType, ESkillLogic eLogic, ESkillCamp eCamp) : BaseSkill(id, eType, eLogic, eCamp)
 {
 
