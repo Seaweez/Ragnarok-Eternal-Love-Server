@@ -68,6 +68,8 @@ class Boss
         return m_dwRefreshTime - m_dwRefreshTime % MIN_T;
       return t;
     }
+
+    // ====== NEW MVP Respawn ======
     virtual DWORD getRefreshTimeMvpV2()
     {
       if (!m_dwDieTime && !m_dwRefreshTime) return 0;
@@ -92,6 +94,8 @@ class Boss
       DWORD nextOddHour = (hour / 2) * 2 + 1;
       return nextOddHour * HOUR_T;
     }
+    // ====== END of NEW MVP Respawn ======
+
     void setSetTime(DWORD dwTime) { m_dwSetTime = dwTime; }
     DWORD getSetTime() const { return m_dwSetTime; }
 
