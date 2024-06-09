@@ -750,7 +750,7 @@ bool xSceneEntryDynamic::isDiffZoneNoDam() const
   return (DWORD)getAttr(EATTRTYPE_ATTREFFECT2) & (1 << 13);
 }
 
-// Cannot be selected as a target by enemies for skills
+// 不可被敌方选择为技能目标
 bool xSceneEntryDynamic::isNoEnemySkilled() const
 {
   return (DWORD)getAttr(EATTRTYPE_ATTREFFECT2) & (1 << 15);

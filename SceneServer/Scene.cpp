@@ -1757,7 +1757,7 @@ void DScene::stopCountDown()
 void DScene::startCountDown()
 {
   if (m_oFuben.getMonsterCountShow() == true)
-    MonsterCountPhase::notify(this, true);      //Turn off monster number prompt
+    MonsterCountPhase::notify(this, true);      //关闭怪物个数提示
 
   setState(xScene::SCENE_STATE_WAIT_CLOSE);
   setCloseTime(xTime::getCurSec() + 10);
@@ -1801,7 +1801,7 @@ void DScene::inviteSummonDeadBoss(SceneUser* user)
 
   if (m_setDeadBossSummonUsers.empty() == false)
   {
-    // The copy has been summoned
+    // 副本已经召唤过
     MsgManager::sendMsg(user->id, 25935);
     return;
   }
@@ -1857,10 +1857,10 @@ void DScene::inviteSummonDeadBoss(SceneUser* user)
     return;
   }
 
-  // in waiting
+  // 在等待中
   if (!m_setWaitReplyUsers.empty())
     return;
-  // Summoned
+  // 已召唤
   if (!m_setDeadBossSummonUsers.empty())
     return;
 
@@ -1879,19 +1879,19 @@ void DScene::inviteSummonDeadBoss(SceneUser* user)
 
   if (hasCntUsers.empty())
   {
-    // direct summons
+    // 直接召唤
     doSummonDeadBoss();
   }
   else
   {
-    // Allow summoning, pop-up box displayed
+    // 允许召唤, 弹框显示
     ReplySummonBossFubenCmd selfcmd;
     selfcmd.set_charid(user->id);
     selfcmd.set_agree(true);
     PROTOBUF(selfcmd, s1, l1);
     user->sendCmdToMe(s1, l1);
 
-    // Notify the captain
+    // 通知队长
     if (!noCntUsers.empty())
     {
       ReplySummonBossFubenCmd retcmd;
@@ -1904,7 +1904,7 @@ void DScene::inviteSummonDeadBoss(SceneUser* user)
       }
     }
 
-    // invite
+    // 邀请
     m_dwWaitWaitReplyTime = now() + 35;
     InviteSummonBossFubenCmd cmd;
     PROTOBUF(cmd, send, len);
@@ -1928,7 +1928,7 @@ void DScene::replySummonDeadBoss(SceneUser* user, bool agree)
   if (!pLeader || pLeader->getScene() != this)
     return;
 
-  // Reply to captain
+  // 回复队长
   ReplySummonBossFubenCmd cmd;
   cmd.set_agree(agree);
   cmd.set_charid(user->id);
@@ -1939,7 +1939,7 @@ void DScene::replySummonDeadBoss(SceneUser* user, bool agree)
   {
     m_setWaitReplyUsers.erase(user->id);
 
-    // everyone has agreed
+    // 所有人都已同意
     if (m_setWaitReplyUsers.empty())
     {
       m_dwWaitWaitReplyTime = 0;
@@ -1948,7 +1948,7 @@ void DScene::replySummonDeadBoss(SceneUser* user, bool agree)
   }
   else
   {
-    // Reject, set cancel
+    // 拒绝, 设置取消
     m_setWaitReplyUsers.clear();
     m_dwWaitWaitReplyTime = 0;
   }
