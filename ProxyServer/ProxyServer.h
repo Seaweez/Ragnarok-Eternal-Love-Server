@@ -1,7 +1,7 @@
 #pragma once
 #include "xServer.h"
 
-#define PROXY_SERVER_TCP_TASK_LIMIT 2000
+#define PROXY_SERVER_TCP_TASK_LIMIT 5000
 
 class ProxyServer : public xServer
 {
